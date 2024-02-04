@@ -15,6 +15,21 @@ cmake ..
 cmake --build .
 ```
 
+### Update
+
+```console
+# 编译Windows可执行文件
+python build.py --platform=Windows
+
+# 编译Android可执行文件
+python build.py --platform=Android
+
+# 清理编译产物
+python build.py --clean
+```
+
+
+
 ## Sample
 
 ```text

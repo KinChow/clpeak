@@ -9,28 +9,19 @@ if (NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE "Release")
 endif()
 
-find_package(OpenCL)
-FIND_PATH(HPP_FOUND CL/opencl.hpp PATHS ${OpenCL_INCLUDE_DIRS})
-if(NOT OpenCL_FOUND OR NOT HPP_FOUND)
-  list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
-  include(BuildSdk)
-
-  find_package(OpenCL REQUIRED)
-
-  set(OpenCL_INCLUDE_DIRS ${OpenCL_INCLUDE_DIRS} "${SDK_ROOT}/include")
-  FIND_PATH(HPP_FOUND CL/opencl.hpp PATHS ${OpenCL_INCLUDE_DIRS} REQUIRED)
+if(ANDROID)
+set(OpenCL_LIBRARIES ${PROJECT_SOURCE_DIR}/external/libs/Android/libOpenCL.a)
+set(LIBLOADER_LIBRARY ${PROJECT_SOURCE_DIR}/external/libs/Android/libLibLoader.a)
+elseif(WIN32)
+set(OpenCL_LIBRARIES ${PROJECT_SOURCE_DIR}/external/libs/Windows/OpenCL.lib)
+set(LIBLOADER_LIBRARY ${PROJECT_SOURCE_DIR}/external/libs/Windows/LibLoader.lib)
 endif()
+set(OpenCL_INCLUDE_DIRS ${PROJECT_SOURCE_DIR}/external/include)
 
-if(NOT OpenCL_FOUND)
-  message(FATAL_ERROR "Could not find OpenCL include/libs. Set OCL_ROOT to your OpenCL SDK")
-else()
-  message(STATUS "Selected OpenCL includes from ${OpenCL_INCLUDE_DIRS}")
-  message(STATUS "Selected OpenCL lib ${OpenCL_LIBRARIES}")
-endif()
 
 # extra libs for static library
 if(UNIX AND ${OpenCL_LIBRARIES} MATCHES "libOpenCL.a")
-  set(OpenCL_LIBRARIES ${OpenCL_LIBRARIES} pthread dl)
+  set(OpenCL_LIBRARIES ${OpenCL_LIBRARIES} dl)
 elseif(WIN32 AND ${OpenCL_LIBRARIES} MATCHES "OpenCL.lib")
   set(OpenCL_LIBRARIES ${OpenCL_LIBRARIES} cfgmgr32.lib runtimeobject.lib)
 endif()
@@ -55,7 +46,7 @@ set(CLPEAK_SOURCE_FILES
 )
 
 add_executable(clpeak ${CLPEAK_SOURCE_FILES})
-target_link_libraries(clpeak ${OpenCL_LIBRARIES})
+target_link_libraries(clpeak ${OpenCL_LIBRARIES} ${LIBLOADER_LIBRARY})
 target_include_directories(clpeak PRIVATE ${OpenCL_INCLUDE_DIRS} "include" "src/kernels")
 target_compile_definitions(clpeak PRIVATE CL_TARGET_OPENCL_VERSION=120)
 
