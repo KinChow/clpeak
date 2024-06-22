@@ -1,4 +1,6 @@
-[submodule "libopencl-stub"]
+[submodule "android/app/src/main/cpp/libopencl-stub"]
 	path = android/app/src/main/cpp/libopencl-stub
-	url = https://github.com/krrishnarraj/libopencl-stub
-	branch = master
+	url = https://github.com/KinChow/libopencl-stub.git
+[submodule "builder"]
+	path = builder
+	url = https://github.com/KinChow/builder.git
