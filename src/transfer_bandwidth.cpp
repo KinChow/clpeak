@@ -18,7 +18,11 @@ int clPeak::runTransferBandwidthTest(cl::CommandQueue &queue, cl::Program &prog,
 
   try
   {
+#ifdef _MSC_VER
+    arr = static_cast<float *>(_aligned_malloc(numItems * sizeof(float), 64));
+#else
     arr = static_cast<float *>(aligned_alloc(64, numItems * sizeof(float)));
+#endif
     memset(arr, 0, numItems * sizeof(float));
     cl::Buffer clBuffer = cl::Buffer(ctx, (CL_MEM_READ_WRITE | CL_MEM_ALLOC_HOST_PTR), (numItems * sizeof(float)));
 
@@ -325,7 +329,11 @@ int clPeak::runTransferBandwidthTest(cl::CommandQueue &queue, cl::Program &prog,
     log->xmlCloseTag(); // transfer_bandwidth
 
     if (arr)
+#ifdef _MSC_VER
+      _aligned_free(arr);
+#else
       std::free(arr);
+#endif
   }
   catch (cl::Error &error)
   {
@@ -336,7 +344,11 @@ int clPeak::runTransferBandwidthTest(cl::CommandQueue &queue, cl::Program &prog,
 
     if (arr)
     {
+#ifdef _MSC_VER
+      _aligned_free(arr);
+#else
       std::free(arr);
+#endif
     }
     return -1;
   }
